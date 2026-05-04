@@ -662,10 +662,7 @@ function showResults() {
     playAgainBtn.textContent = "Game Complete";
     playAgainBtn.disabled = true;
   } else {
-    playAgainBtn.textContent = gameState.isCustomWordGame
-      ? "Next Round"
-      : "Play Again Same Players";
-
+    playAgainBtn.textContent = "Next Round";
     playAgainBtn.disabled = false;
   }
 
@@ -679,12 +676,7 @@ function playAgainSamePlayers() {
     return;
   }
 
-  if (gameState.isCustomWordGame) {
-    startNextRound();
-    return;
-  }
-
-  startGame();
+  startNextRound();
 }
 
 function backToSetup() {
