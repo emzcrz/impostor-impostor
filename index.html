@@ -65,7 +65,7 @@
         </label>
 
         <label class="field">
-          <span>Secret word</span>
+          <span>Single round word</span>
           <input
             id="custom-word-input"
             type="text"
@@ -73,6 +73,24 @@
             autocomplete="off"
           />
         </label>
+
+        <div class="field">
+          <span>Custom word game</span>
+
+          <textarea
+            id="custom-word-list-input"
+            placeholder="Optional: Enter one word per line. Example:
+Pizza
+Beach
+Dragon
+Coffee"
+          ></textarea>
+
+          <p class="helper-text">
+            If you enter words here, the app treats them as a full game.
+            Each round uses one random word, then removes it from the remaining pool.
+          </p>
+        </div>
 
         <label class="field">
           <span>Impostor word mode</span>
@@ -201,9 +219,15 @@
         <p id="result-fake-word" class="result-word"></p>
       </div>
 
+      <div id="word-pool-card" class="card hidden">
+        <h2>Custom Word Game Progress</h2>
+        <p id="word-pool-progress" class="muted"></p>
+        <ul id="used-words-list" class="results-list"></ul>
+      </div>
+
       <div class="button-stack">
         <button id="play-again-btn" class="primary-btn">
-          Play Again Same Players
+          Next Round
         </button>
 
         <button id="back-to-setup-btn" class="secondary-btn">

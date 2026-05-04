@@ -80,23 +80,25 @@ const gameState = {
   playerNames: [],
   players: [],
   impostorCount: 1,
+
   secretWord: "",
   fakeWord: "",
   category: "",
+
   impostorWordMode: "none",
+
+  customWordPool: [],
+  usedWords: [],
+  isCustomWordGame: false,
+
   currentPlayerIndex: 0,
+
   timerDuration: 180,
   timerRemaining: 180,
   timerInterval: null
 };
 
 const screens = document.querySelectorAll(".screen");
-
-const setupScreen = document.getElementById("setup-screen");
-const passScreen = document.getElementById("pass-screen");
-const roleScreen = document.getElementById("role-screen");
-const discussionScreen = document.getElementById("discussion-screen");
-const resultsScreen = document.getElementById("results-screen");
 
 const playerNameInput = document.getElementById("player-name-input");
 const addPlayerBtn = document.getElementById("add-player-btn");
@@ -106,6 +108,7 @@ const playerCountLabel = document.getElementById("player-count-label");
 
 const impostorCountInput = document.getElementById("impostor-count-input");
 const customWordInput = document.getElementById("custom-word-input");
+const customWordListInput = document.getElementById("custom-word-list-input");
 const impostorWordModeSelect = document.getElementById("impostor-word-mode");
 const timerSelect = document.getElementById("timer-select");
 const errorMessage = document.getElementById("error-message");
@@ -133,6 +136,10 @@ const resultWord = document.getElementById("result-word");
 const fakeWordResultCard = document.getElementById("fake-word-result-card");
 const resultFakeWord = document.getElementById("result-fake-word");
 
+const wordPoolCard = document.getElementById("word-pool-card");
+const wordPoolProgress = document.getElementById("word-pool-progress");
+const usedWordsList = document.getElementById("used-words-list");
+
 const playAgainBtn = document.getElementById("play-again-btn");
 const backToSetupBtn = document.getElementById("back-to-setup-btn");
 const newGameBtn = document.getElementById("new-game-btn");
@@ -143,6 +150,14 @@ function showScreen(screenId) {
   });
 
   document.getElementById(screenId).classList.add("active");
+}
+
+function showError(message) {
+  errorMessage.textContent = message;
+}
+
+function clearError() {
+  errorMessage.textContent = "";
 }
 
 function addPlayer() {
@@ -209,36 +224,31 @@ function renderPlayerList() {
   playerCountLabel.textContent = `${count} ${count === 1 ? "player" : "players"}`;
 }
 
-function showError(message) {
-  errorMessage.textContent = message;
-}
+function getCustomWordListFromInput() {
+  const rawText = customWordListInput.value.trim();
 
-function clearError() {
-  errorMessage.textContent = "";
-}
-
-function validateGameSettings() {
-  const playerCount = gameState.playerNames.length;
-  const impostorCount = Number(impostorCountInput.value);
-  const customWord = customWordInput.value.trim();
-
-  if (playerCount < 3) {
-    return "You need at least 3 players.";
+  if (!rawText) {
+    return [];
   }
 
-  if (!Number.isInteger(impostorCount) || impostorCount < 1) {
-    return "You need at least 1 impostor.";
-  }
+  const words = rawText
+    .split("\n")
+    .map(word => word.trim())
+    .filter(word => word.length > 0);
 
-  if (impostorCount >= playerCount) {
-    return "The number of impostors must be fewer than the number of players.";
-  }
+  const uniqueWords = [];
 
-  if (customWord.length > 40) {
-    return "The secret word should be 40 characters or fewer.";
-  }
+  words.forEach(word => {
+    const alreadyExists = uniqueWords.some(existingWord => {
+      return existingWord.toLowerCase() === word.toLowerCase();
+    });
 
-  return null;
+    if (!alreadyExists) {
+      uniqueWords.push(word);
+    }
+  });
+
+  return uniqueWords;
 }
 
 function getRandomWordData() {
@@ -254,7 +264,70 @@ function createCustomWordData(customWord) {
   };
 }
 
+function getRandomWordFromCustomPool() {
+  const randomIndex = Math.floor(Math.random() * gameState.customWordPool.length);
+  const selectedWord = gameState.customWordPool[randomIndex];
+
+  gameState.customWordPool.splice(randomIndex, 1);
+  gameState.usedWords.push(selectedWord);
+
+  return selectedWord;
+}
+
+function hasCustomWordsRemaining() {
+  return gameState.customWordPool.length > 0;
+}
+
+function resetCustomWordGame() {
+  gameState.customWordPool = [];
+  gameState.usedWords = [];
+  gameState.isCustomWordGame = false;
+}
+
+function validateGameSettings() {
+  const playerCount = gameState.playerNames.length;
+  const impostorCount = Number(impostorCountInput.value);
+  const customWord = customWordInput.value.trim();
+  const customWordList = getCustomWordListFromInput();
+
+  if (playerCount < 3) {
+    return "You need at least 3 players.";
+  }
+
+  if (!Number.isInteger(impostorCount) || impostorCount < 1) {
+    return "You need at least 1 impostor.";
+  }
+
+  if (impostorCount >= playerCount) {
+    return "The number of impostors must be fewer than the number of players.";
+  }
+
+  if (customWord.length > 40) {
+    return "The single round word should be 40 characters or fewer.";
+  }
+
+  const hasTooLongCustomWord = customWordList.some(word => {
+    return word.length > 40;
+  });
+
+  if (hasTooLongCustomWord) {
+    return "Each custom word should be 40 characters or fewer.";
+  }
+
+  return null;
+}
+
 function prepareWords() {
+  if (gameState.isCustomWordGame) {
+    const selectedWord = getRandomWordFromCustomPool();
+
+    gameState.secretWord = selectedWord;
+    gameState.fakeWord = "Mystery Word";
+    gameState.category = "Custom";
+
+    return;
+  }
+
   const customWord = customWordInput.value.trim();
 
   const wordData = customWord
@@ -298,10 +371,20 @@ function startGame() {
 
   clearError();
 
+  const customWordList = getCustomWordListFromInput();
+
   gameState.impostorCount = Number(impostorCountInput.value);
   gameState.impostorWordMode = impostorWordModeSelect.value;
   gameState.timerDuration = Number(timerSelect.value);
   gameState.timerRemaining = gameState.timerDuration;
+
+  if (customWordList.length > 0) {
+    gameState.customWordPool = [...customWordList];
+    gameState.usedWords = [];
+    gameState.isCustomWordGame = true;
+  } else {
+    resetCustomWordGame();
+  }
 
   prepareWords();
 
@@ -316,6 +399,50 @@ function startGame() {
   updateTimerDisplay();
 
   showPassScreen();
+}
+
+function startNextRound() {
+  if (gameState.isCustomWordGame && !hasCustomWordsRemaining()) {
+    showGameFinished();
+    return;
+  }
+
+  prepareWords();
+
+  gameState.players = assignRoles(
+    gameState.playerNames,
+    gameState.impostorCount
+  );
+
+  gameState.currentPlayerIndex = 0;
+  gameState.timerRemaining = gameState.timerDuration;
+
+  stopTimer();
+  updateTimerDisplay();
+
+  showPassScreen();
+}
+
+function showGameFinished() {
+  stopTimer();
+
+  impostorResultsList.innerHTML = "";
+
+  const li = document.createElement("li");
+  li.textContent = "All custom words have been used.";
+  impostorResultsList.appendChild(li);
+
+  resultWord.textContent = "Game Complete";
+
+  fakeWordResultCard.classList.add("hidden");
+  resultFakeWord.textContent = "";
+
+  renderWordPoolProgress();
+
+  playAgainBtn.textContent = "Game Complete";
+  playAgainBtn.disabled = true;
+
+  showScreen("results-screen");
 }
 
 function showPassScreen() {
@@ -449,6 +576,30 @@ function updateTimerDisplay() {
   timerDisplay.textContent = `${formattedMinutes}:${formattedSeconds}`;
 }
 
+function renderWordPoolProgress() {
+  if (!gameState.isCustomWordGame) {
+    wordPoolCard.classList.add("hidden");
+    return;
+  }
+
+  wordPoolCard.classList.remove("hidden");
+
+  const usedCount = gameState.usedWords.length;
+  const remainingCount = gameState.customWordPool.length;
+  const totalCount = usedCount + remainingCount;
+
+  wordPoolProgress.textContent =
+    `${usedCount} of ${totalCount} words used. ${remainingCount} remaining.`;
+
+  usedWordsList.innerHTML = "";
+
+  gameState.usedWords.forEach((word, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${index + 1}. ${word}`;
+    usedWordsList.appendChild(li);
+  });
+}
+
 function showResults() {
   stopTimer();
 
@@ -474,6 +625,19 @@ function showResults() {
     resultFakeWord.textContent = "";
   }
 
+  renderWordPoolProgress();
+
+  if (gameState.isCustomWordGame && !hasCustomWordsRemaining()) {
+    playAgainBtn.textContent = "Game Complete";
+    playAgainBtn.disabled = true;
+  } else {
+    playAgainBtn.textContent = gameState.isCustomWordGame
+      ? "Next Round"
+      : "Play Again Same Players";
+
+    playAgainBtn.disabled = false;
+  }
+
   showScreen("results-screen");
 }
 
@@ -481,6 +645,11 @@ function playAgainSamePlayers() {
   if (gameState.playerNames.length < 3) {
     showScreen("setup-screen");
     showError("Add at least 3 players before playing again.");
+    return;
+  }
+
+  if (gameState.isCustomWordGame) {
+    startNextRound();
     return;
   }
 
@@ -498,22 +667,37 @@ function newGame() {
   gameState.playerNames = [];
   gameState.players = [];
   gameState.impostorCount = 1;
+
   gameState.secretWord = "";
   gameState.fakeWord = "";
   gameState.category = "";
+
   gameState.impostorWordMode = "none";
+
+  gameState.customWordPool = [];
+  gameState.usedWords = [];
+  gameState.isCustomWordGame = false;
+
   gameState.currentPlayerIndex = 0;
+
   gameState.timerDuration = 180;
   gameState.timerRemaining = 180;
 
   playerNameInput.value = "";
   impostorCountInput.value = "1";
   customWordInput.value = "";
+  customWordListInput.value = "";
   impostorWordModeSelect.value = "none";
   timerSelect.value = "180";
 
+  playAgainBtn.disabled = false;
+  playAgainBtn.textContent = "Next Round";
+
+  wordPoolCard.classList.add("hidden");
+
   clearError();
   renderPlayerList();
+  updateTimerDisplay();
   showScreen("setup-screen");
 }
 

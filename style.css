@@ -28,7 +28,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -37,7 +38,12 @@ button {
   cursor: pointer;
 }
 
-button:active {
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button:active:not(:disabled) {
   transform: scale(0.98);
 }
 
@@ -142,7 +148,8 @@ h2 {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   padding: 14px 14px;
   border-radius: 14px;
@@ -152,9 +159,23 @@ select {
   outline: none;
 }
 
+textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   border-color: var(--primary);
+}
+
+.helper-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 .primary-btn,
@@ -180,7 +201,7 @@ select:focus {
   color: #111827;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--primary-dark);
 }
 
@@ -189,7 +210,7 @@ select:focus {
   color: var(--text);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover:not(:disabled) {
   background: #475569;
 }
 
@@ -198,7 +219,7 @@ select:focus {
   color: white;
 }
 
-.danger-btn:hover {
+.danger-btn:hover:not(:disabled) {
   background: var(--danger-dark);
 }
 
@@ -209,7 +230,7 @@ select:focus {
   margin-top: 10px;
 }
 
-.ghost-btn:hover {
+.ghost-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -243,6 +264,10 @@ select:focus {
   padding: 12px;
   border-radius: 14px;
   margin-top: 8px;
+}
+
+.results-list li {
+  justify-content: flex-start;
 }
 
 .player-name {
