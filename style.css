@@ -183,6 +183,35 @@ textarea:focus {
   line-height: 1.45;
 }
 
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.checkbox-card input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.checkbox-card span {
+  margin: 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
 .primary-btn,
 .secondary-btn,
 .danger-btn,
@@ -410,5 +439,9 @@ textarea:focus {
 
   .button-row {
     flex-direction: column;
+  }
+
+  .checkbox-grid {
+    grid-template-columns: 1fr;
   }
 }
