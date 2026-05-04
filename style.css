@@ -129,6 +129,11 @@ h2 {
   font-weight: 700;
 }
 
+.center-pill {
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
 .input-row {
   display: flex;
   gap: 10px;

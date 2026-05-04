@@ -91,10 +91,11 @@ const gameState = {
   usedWords: [],
   isCustomWordGame: false,
 
+  roundNumber: 0,
   currentPlayerIndex: 0,
 
-  timerDuration: 180,
-  timerRemaining: 180,
+  timerDuration: 0,
+  timerRemaining: 0,
   timerInterval: null
 };
 
@@ -114,6 +115,7 @@ const timerSelect = document.getElementById("timer-select");
 const errorMessage = document.getElementById("error-message");
 const startGameBtn = document.getElementById("start-game-btn");
 
+const roundLabel = document.getElementById("round-label");
 const passMessage = document.getElementById("pass-message");
 const revealRoleBtn = document.getElementById("reveal-role-btn");
 
@@ -284,6 +286,19 @@ function resetCustomWordGame() {
   gameState.isCustomWordGame = false;
 }
 
+function rotatePlayerOrder(playerNames, roundNumber) {
+  if (playerNames.length === 0) {
+    return [];
+  }
+
+  const startIndex = roundNumber % playerNames.length;
+
+  return [
+    ...playerNames.slice(startIndex),
+    ...playerNames.slice(0, startIndex)
+  ];
+}
+
 function validateGameSettings() {
   const playerCount = gameState.playerNames.length;
   const impostorCount = Number(impostorCountInput.value);
@@ -386,10 +401,17 @@ function startGame() {
     resetCustomWordGame();
   }
 
+  gameState.roundNumber = 0;
+
   prepareWords();
 
-  gameState.players = assignRoles(
+  const rotatedPlayerNames = rotatePlayerOrder(
     gameState.playerNames,
+    gameState.roundNumber
+  );
+
+  gameState.players = assignRoles(
+    rotatedPlayerNames,
     gameState.impostorCount
   );
 
@@ -407,10 +429,17 @@ function startNextRound() {
     return;
   }
 
+  gameState.roundNumber++;
+
   prepareWords();
 
-  gameState.players = assignRoles(
+  const rotatedPlayerNames = rotatePlayerOrder(
     gameState.playerNames,
+    gameState.roundNumber
+  );
+
+  gameState.players = assignRoles(
+    rotatedPlayerNames,
     gameState.impostorCount
   );
 
@@ -448,7 +477,9 @@ function showGameFinished() {
 function showPassScreen() {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
 
+  roundLabel.textContent = `Round ${gameState.roundNumber + 1}`;
   passMessage.textContent = `Pass the phone to ${currentPlayer.name}.`;
+
   showScreen("pass-screen");
 }
 
@@ -678,17 +709,18 @@ function newGame() {
   gameState.usedWords = [];
   gameState.isCustomWordGame = false;
 
+  gameState.roundNumber = 0;
   gameState.currentPlayerIndex = 0;
 
-  gameState.timerDuration = 180;
-  gameState.timerRemaining = 180;
+  gameState.timerDuration = 0;
+  gameState.timerRemaining = 0;
 
   playerNameInput.value = "";
   impostorCountInput.value = "1";
   customWordInput.value = "";
   customWordListInput.value = "";
   impostorWordModeSelect.value = "none";
-  timerSelect.value = "180";
+  timerSelect.value = "0";
 
   playAgainBtn.disabled = false;
   playAgainBtn.textContent = "Next Round";

@@ -106,10 +106,10 @@ Coffee"
           <span>Discussion timer</span>
 
           <select id="timer-select">
-            <option value="0">No timer</option>
+            <option value="0" selected>No timer</option>
             <option value="60">1 minute</option>
             <option value="120">2 minutes</option>
-            <option value="180" selected>3 minutes</option>
+            <option value="180">3 minutes</option>
             <option value="300">5 minutes</option>
             <option value="600">10 minutes</option>
           </select>
@@ -130,6 +130,7 @@ Coffee"
         <h1>Pass the Phone</h1>
 
         <div class="card big-card">
+          <p id="round-label" class="pill center-pill"></p>
           <p id="pass-message" class="large-text"></p>
           <p class="muted">
             Make sure nobody else can see the screen.
@@ -173,7 +174,7 @@ Coffee"
 
           <div id="timer-box" class="timer-box hidden">
             <p class="muted">Time remaining</p>
-            <div id="timer-display" class="timer-display">03:00</div>
+            <div id="timer-display" class="timer-display">00:00</div>
 
             <div class="button-row">
               <button id="start-timer-btn" class="small-btn">
