@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Impostors Local</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="app">
+    <!-- SETUP SCREEN -->
+    <section id="setup-screen" class="screen active">
+      <div class="header">
+        <p class="eyebrow">Pass & Play</p>
+        <h1>Impostors Local</h1>
+        <p class="subtitle">
+          A local party game where everyone gets the word... except the impostor.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <h2>Players</h2>
+          <span id="player-count-label" class="pill">0 players</span>
+        </div>
+
+        <div class="input-row">
+          <input
+            id="player-name-input"
+            type="text"
+            placeholder="Enter player name"
+            autocomplete="off"
+          />
+
+          <button id="add-player-btn" class="small-btn">
+            Add
+          </button>
+        </div>
+
+        <ul id="player-list" class="player-list"></ul>
+
+        <button id="clear-players-btn" class="ghost-btn">
+          Clear Players
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>Game Settings</h2>
+
+        <label class="field">
+          <span>Number of impostors</span>
+          <input
+            id="impostor-count-input"
+            type="number"
+            min="1"
+            value="1"
+          />
+        </label>
+
+        <label class="field">
+          <span>Secret word</span>
+          <input
+            id="custom-word-input"
+            type="text"
+            placeholder="Leave blank for random word"
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="field">
+          <span>Impostor word mode</span>
+
+          <select id="impostor-word-mode">
+            <option value="none">No word</option>
+            <option value="fake">Fake word</option>
+            <option value="category">Category only</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Discussion timer</span>
+
+          <select id="timer-select">
+            <option value="0">No timer</option>
+            <option value="60">1 minute</option>
+            <option value="120">2 minutes</option>
+            <option value="180" selected>3 minutes</option>
+            <option value="300">5 minutes</option>
+            <option value="600">10 minutes</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="error-message" class="error-message"></p>
+
+      <button id="start-game-btn" class="primary-btn">
+        Start Game
+      </button>
+    </section>
+
+    <!-- PASS SCREEN -->
+    <section id="pass-screen" class="screen">
+      <div class="center-content">
+        <p class="eyebrow">Keep it secret</p>
+        <h1>Pass the Phone</h1>
+
+        <div class="card big-card">
+          <p id="pass-message" class="large-text"></p>
+          <p class="muted">
+            Make sure nobody else can see the screen.
+          </p>
+        </div>
+
+        <button id="reveal-role-btn" class="primary-btn">
+          Reveal Role
+        </button>
+      </div>
+    </section>
+
+    <!-- ROLE SCREEN -->
+    <section id="role-screen" class="screen">
+      <div class="center-content">
+        <p class="eyebrow">Your secret role</p>
+        <h1 id="role-player-name">Player</h1>
+
+        <div id="role-card" class="card role-card">
+          <p id="role-message" class="role-message"></p>
+          <h2 id="word-message" class="secret-word"></h2>
+          <p id="role-hint" class="muted"></p>
+        </div>
+
+        <button id="next-player-btn" class="primary-btn">
+          Hide & Continue
+        </button>
+      </div>
+    </section>
+
+    <!-- DISCUSSION SCREEN -->
+    <section id="discussion-screen" class="screen">
+      <div class="center-content">
+        <p class="eyebrow">Game started</p>
+        <h1>Discussion Time</h1>
+
+        <div class="card big-card">
+          <p class="large-text">
+            Ask questions, defend yourself, and find the impostor.
+          </p>
+
+          <div id="timer-box" class="timer-box hidden">
+            <p class="muted">Time remaining</p>
+            <div id="timer-display" class="timer-display">03:00</div>
+
+            <div class="button-row">
+              <button id="start-timer-btn" class="small-btn">
+                Start
+              </button>
+
+              <button id="pause-timer-btn" class="small-btn secondary">
+                Pause
+              </button>
+
+              <button id="reset-timer-btn" class="small-btn secondary">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button id="reveal-results-btn" class="danger-btn">
+          Reveal Results
+        </button>
+      </div>
+    </section>
+
+    <!-- RESULTS SCREEN -->
+    <section id="results-screen" class="screen">
+      <div class="header">
+        <p class="eyebrow">Round over</p>
+        <h1>Results</h1>
+      </div>
+
+      <div class="card">
+        <h2>Impostors</h2>
+        <ul id="impostor-results-list" class="results-list"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Secret Word</h2>
+        <p id="result-word" class="result-word"></p>
+      </div>
+
+      <div id="fake-word-result-card" class="card hidden">
+        <h2>Fake Word</h2>
+        <p id="result-fake-word" class="result-word"></p>
+      </div>
+
+      <div class="button-stack">
+        <button id="play-again-btn" class="primary-btn">
+          Play Again Same Players
+        </button>
+
+        <button id="back-to-setup-btn" class="secondary-btn">
+          Back to Setup
+        </button>
+
+        <button id="new-game-btn" class="ghost-btn">
+          New Game
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
